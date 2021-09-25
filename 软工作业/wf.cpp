@@ -20,6 +20,7 @@ struct alphabeticStruct //定义	结构体
 
 alphabeticStruct letterStruct[26];
 
+
 bool isUpperLetter(char x){
 	return 'A' <= x && x <= 'Z';
 }
@@ -95,7 +96,7 @@ void alphabeticStatistics(char *fileName) //第0步 统计频率
 		inFile >> str;
 		wordcount[str]++;
 	}
-	priority_queue<pair<int,string>, vector<pair<int,string> >, greater<pair<int,string> > > queueK; //建立队列 
+	priority_queue<pair<int,string>, vector<pair<int,string> >, less<pair<int,string> > > queueK; //建立队列 
 	
 	for (map<string,int>::iterator iter=wordcount.begin(); iter!=wordcount.end(); iter++)
 		queueK.push(make_pair(iter->second,iter->first));
@@ -215,8 +216,7 @@ void wordStatisticsTopK(char *fileName, const int &k)
 	cout << fileName << "\t单词种类："<< wordcount.size() << endl;
 	//优先队列使用小顶堆，排在前面的数量少，使用">";
 	priority_queue<pair<int,string>, vector<pair<int,string> >, greater<pair<int,string> > > queueK;
-	for (map<string,int>::iterator iter=wordcount.begin(); iter!=wordcount.end(); iter++)
-	{
+	for (map<string,int>::iterator iter=wordcount.end(); iter!=wordcount.begin(); iter++){
 		queueK.push(make_pair(iter->second,iter->first));
 		if(queueK.size() > k)
 			queueK.pop();
@@ -229,6 +229,7 @@ void wordStatisticsTopK(char *fileName, const int &k)
 		cout<<tmp.second<<"\t"<<tmp.first<<endl;
 	}
 }
+
 
 void erasePunct(string &s)
 {
@@ -271,6 +272,7 @@ class WordFrequency
 		WordFrequency(const std::string &filename, const std::string &stopFile);//初始化
 		void ReadStopFile();
 		void ReadWordFile();
+		static int vocabularyLenth;
 		void sortWordByFrequency();
 		void printWordFrequency()const;
 	private:
@@ -287,6 +289,7 @@ class WordFrequency
 		std::vector<std::pair<std::string, int> > words_;
 };
 
+int WordFrequency::vocabularyLenth = 1;
 
 WordFrequency::WordFrequency(const std::string &filename, const std::string &stopFile)
 	:filename_(filename),stopFile_(stopFile)
@@ -370,7 +373,7 @@ void WordFrequency::printWordFrequency()const
 		it ++;
 	}
 }
-
+	
 
 
 
@@ -428,4 +431,3 @@ int main(int argc, char *argv[])
 	return 0;
 	
 } 
-
