@@ -109,6 +109,50 @@ void alphabeticStatistics(char *fileName) //第0步 统计频率
 		cout<<tmp.second<<"\t"<<tmp.first<<endl;
 	}
 }
+
+void wordGroups(char *fileName, int n){
+	ifstream inFile;
+	inFile.open(fileName);
+	if( !inFile.is_open()){
+		cout << fileName << ":文件打开失败" << endl;
+		exit(1);
+	}
+	string str;
+	queue<string>strque;
+	string words[20];
+	int i = 0, j = 0;
+	while( !inFile.eof()){
+		inFile >> str;
+		if((str[0] >= 'a' && str[0] <= 'z') || str[0] >= 'A' && str[0] <= 'Z'){
+			strque.push(str);
+			
+			i++;
+			if(i == n){
+				while(j!=n){
+					cout<<strque.front()<<" ";
+					words[j] = strque.front();
+					strque.pop();
+					j++;	
+				}
+				cout<<endl;
+				i = 0;
+				j = 0;
+			}
+		}
+	}
+	if(!strque.empty()){
+		for( j = strque.size(); j < n; j++)
+			cout<<words[j]<<" ";
+		}
+	while(!strque.empty()){
+		cout<<strque.front()<<" ";
+		strque.pop();
+	}
+	cout<<endl;
+}
+
+
+
 vector<string> getFileList(string dir)
 {
 	vector<string> allPath;
@@ -406,7 +450,10 @@ int main(int argc, char *argv[])
 		}			
 	}		 
 	else if(argc == 4){// wf.exe -d -s
-		if(!strcmp(argv[1], "-d")|| !strcmp(argv[2], "-s")){
+		if(!strcmp(argv[1],"-p")){ 
+			wordGroups(argv[2],atoi(argv[3])); 	
+		} 
+		else if(!strcmp(argv[1], "-d")|| !strcmp(argv[2], "-s")){
 			vector<string>allPath = getFileListInMenu(strcat(currentFilePath, argv[3]));
 			for(size_t i = 0; i < allPath.size(); i++){
 				string perPath = allPath.at(i);
@@ -428,6 +475,5 @@ int main(int argc, char *argv[])
 			wf.printWordFrequency();
 		}
 	}
-	return 0;
-	
+	return 0;	
 } 
