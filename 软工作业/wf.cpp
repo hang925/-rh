@@ -246,7 +246,6 @@ void wordStatisticsTopK(char *fileName, const int &k)
 		cout << fileName << ":文件打开失败" << endl;
 		exit(1);
 	}
-	
 	string str;
 	map<string,int>wordcount;
 
@@ -256,14 +255,14 @@ void wordStatisticsTopK(char *fileName, const int &k)
 		wordcount[str]++;
 	}
 	cout << fileName << "\t单词种类："<< wordcount.size() << endl;
-	//优先队列使用小顶堆，排在前面的数量少，使用">";
 	priority_queue<pair<int,string>, vector<pair<int,string> >, greater<pair<int,string> > > queueK;
-	for (map<string,int>::iterator iter=wordcount.end(); iter!=wordcount.begin(); iter++){
+	for (map<string,int>::iterator iter=wordcount.begin(); iter!=wordcount.end(); iter++){
 		queueK.push(make_pair(iter->second,iter->first));
 		if(queueK.size() > k)
 			queueK.pop();
 	}
 	pair<int,string>tmp;
+	
 	while (!queueK.empty())
 	{
 		tmp=queueK.top();
@@ -498,8 +497,8 @@ int main(int argc, char *argv[])
 		}
 		else if(!strcmp(argv[1], "-v"))
 			dynamicPrototype(argv[2],argv[3]);	
-		else if(strcmp(argv[1], "-n") == 0 || atoi(argv[2])%1 == 0)//支持 -n 参数，输出出现次数最多的前 n 个单词。	
-			wordStatisticsTopK(argv[3], atoi(argv[2]));
+		else if(strcmp(argv[1], "-n") == 0 || atoi(argv[2])%1 == 0){//支持 -n 参数，输出出现次数最多的前 n 个单词。	
+			wordStatisticsTopK(argv[3], atoi(argv[2]));}
 	}
 	else if(argc == 5)
 	{
