@@ -17,6 +17,7 @@ struct alphabeticStruct //定义	结构体
 		letterNumber = lN;
 	}
 };
+typedef pair<string, int> PAIR;
 
 alphabeticStruct letterStruct[26];
 
@@ -110,6 +111,12 @@ void alphabeticStatistics(char *fileName) //第0步 统计频率
 	}
 }
 
+struct CmpByValue {    
+  bool operator()(const PAIR& lhs, const PAIR& rhs) {    
+    return lhs.second > rhs.second;    
+  }    
+};
+
 void wordGroups(char *fileName, int n){
 	ifstream inFile;
 	inFile.open(fileName);
@@ -118,39 +125,30 @@ void wordGroups(char *fileName, int n){
 		exit(1);
 	}
 	string str;
-	queue<string>strque;
-	string words[20];
+	string wordgroup;
+	map<string,int>strmap;
 	int i = 0, j = 0;
 	while( !inFile.eof()){
-		inFile >> str;
-		if((str[0] >= 'a' && str[0] <= 'z') || str[0] >= 'A' && str[0] <= 'Z'){
-			strque.push(str);
-			
+		while(i!=n){
+			inFile >> str;
+			if((str[0] >= 'a' && str[0] <= 'z') || str[0] >= 'A' && str[0] <= 'Z'){
+				if(wordgroup!=""){
+					wordgroup += " ";
+					wordgroup += str;
+				}else
+					wordgroup += str;
+			}	
 			i++;
-			if(i == n){
-				while(j!=n){
-					cout<<strque.front()<<" ";
-					words[j] = strque.front();
-					strque.pop();
-					j++;	
-				}
-				cout<<endl;
-				i = 0;
-				j = 0;
-			}
 		}
+		i = 0;
+		strmap[wordgroup]++;	
+		wordgroup = "";
 	}
-	if(!strque.empty()){
-		for( j = strque.size(); j < n; j++)
-			cout<<words[j]<<" ";
-		}
-	while(!strque.empty()){
-		cout<<strque.front()<<" ";
-		strque.pop();
-	}
-	cout<<endl;
+	vector<PAIR> strvec(strmap.begin(), strmap.end());
+	sort(strvec.begin(), strvec.end(), CmpByValue());
+	for (int i = 0; i != strvec.size(); ++i)   //可在此对按value排完序之后进行操作  
+        cout << strvec[i].first << " "<< strvec[i].second << endl;  
 }
-
 
 
 vector<string> getFileList(string dir)
@@ -403,13 +401,11 @@ bool cmp(const pair<string, int> &a, const pair<string, int>&b)
 	return a.second > b.second;
 }
 
-void WordFrequency::sortWordByFrequency()
-{
+void WordFrequency::sortWordByFrequency(){
 	sort(words_.begin(), words_.end(), cmp);
 }
 
-void WordFrequency::printWordFrequency()const
-{
+void WordFrequency::printWordFrequency()const{
 	Wordkit it = words_.begin();
 	while(it != words_.end())
 	{
@@ -418,9 +414,48 @@ void WordFrequency::printWordFrequency()const
 	}
 }
 	
-
-
-
+void dynamicPrototype(char *fileName1,char *fileName2){
+	ifstream inFile1;
+	inFile1.open(fileName1);
+	if( !inFile1.is_open()){
+		cout << fileName1 << ":文件打开失败" << endl;
+		exit(1);
+	}
+	string str;
+	string s;
+	int i = 0; 
+	string v;
+	map<string,string>strmap;
+	while(getline(inFile1,str)){
+		i = 0;
+		v = "";
+		istringstream is(str);
+		while(is >> s){    //istringstream 分割字符串
+			if(!i)
+				v = s;
+			else
+				strmap[s] = v;
+			i++;
+		} 				
+	}
+	ifstream inFile2;
+	inFile2.open(fileName2);
+	if( !inFile2.is_open()){
+		cout << fileName2 << ":文件打开失败" << endl;
+		exit(1);
+	}
+	while( !inFile2.eof()){
+		inFile2 >> str;
+		map<string, string>::reverse_iterator iter;
+    	for(iter = strmap.rbegin(); iter != strmap.rend(); iter++)
+    		if(str == iter->first)
+    			str=iter->second;
+    	cout<<str<<" ";
+	}
+}
+	
+	
+	
 
 int main(int argc, char *argv[])
 {
@@ -447,20 +482,23 @@ int main(int argc, char *argv[])
 				string perPath = allPath.at(i);
 				wordStatistics( (char *)perPath.c_str() );
 			}
-		}			
+		}		
 	}		 
 	else if(argc == 4){// wf.exe -d -s
 		if(!strcmp(argv[1],"-p")){ 
 			wordGroups(argv[2],atoi(argv[3])); 	
 		} 
 		else if(!strcmp(argv[1], "-d")|| !strcmp(argv[2], "-s")){
+			
 			vector<string>allPath = getFileListInMenu(strcat(currentFilePath, argv[3]));
 			for(size_t i = 0; i < allPath.size(); i++){
 				string perPath = allPath.at(i);
 				wordStatistics((char *)perPath.c_str());
 			}
 		}
-		else if(strcmp(argv[1], "-n") == 0 || atoi(argv[2])%1 == 0)//支持 -n 参数，输出出现次数最多的前 n 个单词。
+		else if(!strcmp(argv[1], "-v"))
+			dynamicPrototype(argv[2],argv[3]);	
+		else if(strcmp(argv[1], "-n") == 0 || atoi(argv[2])%1 == 0)//支持 -n 参数，输出出现次数最多的前 n 个单词。	
 			wordStatisticsTopK(argv[3], atoi(argv[2]));
 	}
 	else if(argc == 5)

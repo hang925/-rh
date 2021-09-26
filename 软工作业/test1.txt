@@ -1,0 +1,7 @@
+bear	bore	borne	born
+alight	alighted	alit	alighted	alit
+arise	arose	arisen
+awake	awoke	awaked	awoken	awoke	awaked
+be	were	was	been
+beat	beat	beaten
+become	became	become
